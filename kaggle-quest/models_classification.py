@@ -222,7 +222,7 @@ class GenericModelClass(object):
                 scoring_metric=self.scoring_metric)
 
         else:
-            cv_score {'mean_error': 0.0, 'std_error': 0.0}
+            cv_score = {'mean_error': 0.0, 'std_error': 0.0}
 
         self.classification_output[
             'CVMethod'] = 'KFold - ' + str(self.cv_folds)
@@ -238,3 +238,30 @@ class GenericModelClass(object):
         self.classification_output['ConfusionMatrix'] = pd.crosstab(self.data_train[self.target],
                                                                     self.train_predictions).to_string()
         self.classification_output['Predictors'] = str(self.predictors)
+
+    def printReport(self):
+        """
+        Print the metrics determined in the calc_model_characteristics()
+        function.
+        """
+        print('\n*************Model Report*************')
+        print('\n*                                    *')
+        print('\n*                                    *')
+        print('\n**************************************')
+
+        print('\nConfusion Matrix:')
+        print(pd.crosstab(self.data_train[
+              self.target], self.train_predictions))
+        print('\nNote: rows - actual; col- predicted')
+        print("\nTrain (Accuracy) : %s" % "{0:.5%}".format(
+            self.classification_output['Accuracy']))
+
+        if self.scoring_metric != 'accuracy':
+            print("Train (%s) : %f" % (self.scoring_metric,
+                                       self.classification_output['ScoringMetric']))
+
+        print("AUC : %s" % "{0:.5%}".format(self.classification_output['AUC']))
+
+        print("CV score (Specified Metric) : Mean - {:f}| Std - {:f}".format(
+            self.classification_output['CVScore_mean'],
+            self.classification_output['CVScore_std']))
