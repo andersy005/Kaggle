@@ -265,3 +265,23 @@ class GenericModelClass(object):
         print("CV score (Specified Metric) : Mean - {:f}| Std - {:f}".format(
             self.classification_output['CVScore_mean'],
             self.classification_output['CVScore_std']))
+
+    def submission(self, IDcol, filename="Submission.csv"):
+        """
+        Create submission file with the absolute prediction
+        """
+        submission = pd.DataFrame({x: self.data_test[x] for x in list(IDcol)})
+        submission[self.target] = self.test_predictions.astype(int)
+        submission.to_csv(filename, index=False)
+
+    def submission_proba(self, IDcol, proba_colnames, filename="Submission.csv"):
+        submission = pd.DataFrame({x: self.data_test[x] for x in list(IDcol)})
+
+        if len(list(proba_colnames)) > 1:
+            for i in range(len(proba_colnames)):
+                submission[proba_colnames[i]] = self.test_pred_prob[:, i]
+
+        else:
+            submission[list(proba_colnames)[0]] = self.test_pred_prob[:, 1]
+
+        submission.to_csv(filename, index=False)
