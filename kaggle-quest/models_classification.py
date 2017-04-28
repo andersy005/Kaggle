@@ -42,7 +42,7 @@ class GenericModelClass(object):
     """
 
     def __init__(self, model, data_train, data_test, target,
-        predictors=[], cv_folds=5, scoring_metric='accuracy'):
+                 predictors=[], cv_folds=5, scoring_metric='accuracy'):
         """Initialization"""
         self.model = model            # an instance of particular model class
         self.data_train = data_train   # training data
@@ -66,8 +66,8 @@ class GenericModelClass(object):
         # Define a Series object to store generic classidication model
         # outcomes:
         self.classification_output = pd.Series(index=['ModelID', 'Accuracy', 'CVScore_mean',
-                                                'CVScore_std', 'AUC', 'ActualScore(manual entry)',
-                                                'CVMethod', 'ConfusionMatrix', 'Predictors'])
+                                                      'CVScore_std', 'AUC', 'ActualScore(manual entry)',
+                                                      'CVMethod', 'ConfusionMatrix', 'Predictors'])
 
         # not to be used for all but most
         self.feature_imp = None
@@ -109,10 +109,9 @@ class GenericModelClass(object):
 
         return {'mean_error': np.mean(error),
                 'std_error': np.std(error),
-                 'all_error': error}
+                'all_error': error}
 
     def RecursiveFeatureElimination(self, nfeat=None, step=1, inplace=False):
-
         """
           # Implement recursive feature elimination
           # Inputs:
@@ -122,21 +121,46 @@ class GenericModelClass(object):
           # Returns:
           #     selected - a series object containing the selected features
          """
+        rfe = RFE(self.model, n_features_to_select=nfeat, step=step)
+        rfe.fit(self.data_train[self.predictors], self.data_train[self.target])
+        ranks = pd.Series(rfe.ranking_, index=self.predictors)
+        selected = ranks.loc[rfe.support_]
+
+        if inplace:
+            self.set_predictors(selected.index.tolist())
+
+        return selected
+
+    def RecursiveFeatureEliminationCV(self, step=1, inplace=False):
+        """
+        Performs similar function as RFE but with CV.
+        It removes features similar to RFE but the the importance of the
+        group of features is based on the cross-validation score. The set 
+        of features with highest cross validation scores is then chosen. 
+        The difference from RFE is that the #features is not an input but 
+        selected by model.
+
+        """
+
         rfecv = RFECV(self.model, step=step, cv=self.cv_folds,
-                   scoring=self.scoring_metric)
-        rfecv.fit(self.data_train[self.predictors], 
-                self.data_train[self.target])
-        min_nfeat = len(self.predictors) - step*(len(rfecv.grid_scores_) - 1)
+                      scoring=self.scoring_metric)
 
+        rfecv.fit(self.data_train[self.predictors],
+                  self.data_train[self.target])
 
+        # n - step*(number of iter - 1)
+        min_nfeat = len(self.predictors) - step * (len(rfecv.grid_scores_) - 1)
 
-         
-        
+        plt.xlabel("Number of features selected")
+        plt.ylabel("Cross validation score (nb of correct classification)")
+        plt.plot(range(min_nfeat, len(self.predictors) + 1, step),
+                 rfecv.grid_scores_)
+        plt.show(block=False)
 
+        ranks = pd.Series(rfecv.ranking_, index=self.predictors)
+        selected = ranks.loc[rfec.support_]
 
-    
+        if inplace:
+            self.set_predictors(selected.index.tolist())
 
-
-
-
-    
+        return ranks
