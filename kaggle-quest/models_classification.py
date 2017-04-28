@@ -164,3 +164,35 @@ class GenericModelClass(object):
             self.set_predictors(selected.index.tolist())
 
         return ranks
+
+    def GridSearch(self, param_grid, n_jobs=1, iid=True, cv=None):
+        """
+        Perform Grid-Search with cv
+        """
+
+        self.gridsearch_class = GridSearchCV(self.model, param_grid=param_grid,
+                                             scoring=self.scoring_metric,
+                                             n_jobs=n_jobs,
+                                             iid=iid,
+                                             cv=cv)
+        self.gridsearch_class.fit(
+            self.data_train[self.predictors], self.data_train[self.target])
+
+        print('Grid Search Results: \n')
+
+        self.gridsearch_result = pd.DataFrame()
+
+        for key in param_grid.keys():
+            self.gridsearch_result[key] = [x[0][key]
+                                           for x in self.gridsearch_class.grid_scores_]
+
+        self.gridsearch_result['meanCV'] = [x[1]
+                                            for x in self.gridsearch_class.grid_scores_]
+
+        self.gridsearch_result['stdCV'] = [
+            np.std(x[2]) for x in self.gridsearch_class.grid_scores_]
+
+        print(self.gridsearch_result)
+
+        print('\nBest Parameters: ', self.gridsearch_class.best_params_)
+        print('\nBest Score: ', self.gridsearch_class.best_score_)
