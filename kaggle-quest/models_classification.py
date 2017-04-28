@@ -196,3 +196,45 @@ class GenericModelClass(object):
 
         print('\nBest Parameters: ', self.gridsearch_class.best_params_)
         print('\nBest Score: ', self.gridsearch_class.best_score_)
+
+    def calc_model_characteristics(self, performCV=True):
+        """
+        Determine key metrics to analyze the classification model. These are stored in the 
+        classification_output series object belong to this class.
+        """
+
+        self.classification_output['Accuracy'] = metrics.accuracy_score(
+            self.data_train[self.target],
+            self.train_predictions)
+
+        # define scoring metric:
+        if self.scoring_metric == 'roc_auc':
+            self.classification_output['ScoringMetric'] = metrics.roc_auc_score(
+                self.data_train[self.target],
+                self.train_pred_prob[:, 1])
+        elif self.scoring_metric == 'log_loss':
+            self.classification_output['ScoringMetric'] = metrics.log_loss(
+                self.data_train[self.target],
+                self.train_pred_prob)
+
+        if performCV:
+            cv_score = self.KFold_CrossValidation(
+                scoring_metric=self.scoring_metric)
+
+        else:
+            cv_score {'mean_error': 0.0, 'std_error': 0.0}
+
+        self.classification_output[
+            'CVMethod'] = 'KFold - ' + str(self.cv_folds)
+        self.classification_output['CVScore_mean'] = cv_score['mean_error']
+        self.classification_output['CVScore_std'] = cv_score['std_error']
+
+        if self.num_target_class < 3:
+            self.classification_output['AUC'] = metrics.roc_auc_score(self.data_train[self.target],
+                                                                      self.train_pred_prob[:, 1])
+        else:
+            self.classification_output['AUC'] = np.nan
+
+        self.classification_output['ConfusionMatrix'] = pd.crosstab(self.data_train[self.target],
+                                                                    self.train_predictions).to_string()
+        self.classification_output['Predictors'] = str(self.predictors)
