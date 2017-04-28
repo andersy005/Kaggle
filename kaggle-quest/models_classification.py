@@ -285,3 +285,16 @@ class GenericModelClass(object):
             submission[list(proba_colnames)[0]] = self.test_pred_prob[:, 1]
 
         submission.to_csv(filename, index=False)
+
+
+    def create_ensemble_dir(self):
+        """
+        checks whether the ensemble directory exists and creates one if it 
+        doesn't.
+        """
+
+        ensdir = os.path.join(os.getcwd(), 'ensemble')
+        if not os.path.isdir(ensdir):
+            os.mkdir(ensdir)
+
+            
