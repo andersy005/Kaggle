@@ -306,20 +306,19 @@ class Logistic_Regression(GenericModelClass):
 
     def __init__(self, data_train, data_test, target, predictors=[], cv_folds=10, scoring_metric='accuracy'):
         GenericModelClass.__init__(self, model=Logistic_Regression(), data_train=data_train,
-                                   data_test=data_test, target=target, 
+                                   data_test=data_test, target=target,
                                    predictors=predictors,
-                                   cv_folds = cv_folds,
+                                   cv_folds=cv_folds,
                                    scoring_metric=scoring_metric)
 
-        self.default_parameters = {'C':1.0, 'tol':0.0001, 'solver':'liblinear','multi_class':'ovr',
-                                    'class_weight':'balanced'}
+        self.default_parameters = {'C': 1.0, 'tol': 0.0001, 'solver': 'liblinear', 'multi_class': 'ovr',
+                                   'class_weight': 'balanced'}
 
         self.model_output = pd.Series(self.default_parameters)
         self.model_output['Coefficients'] = "-"
 
         # Set parameters to default values:
         self.set_parameters(set_default=True)
-
 
     def set_parameters(self, param=None, set_default=False):
         """
@@ -355,5 +354,45 @@ class Logistic_Regression(GenericModelClass):
         if 'cv_folds' in param:
             self.cv_folds = param['cv_folds']
 
+    def modelfit(self, performCV=True):
+        """
+        #Fit the model using predictors and parameters specified before.
+        # Inputs:
+        #     printCV - if True, CV is performed
+        """
 
+        # Output the parameters for the model for cross-checking
+        print('Model being built with the following parameters:\n\n')
+        print(self.model.get_params())
 
+        self.model.fit(self.data_train[
+                       self.predictors], self.data_train[self.target])
+
+        if self.num_target_class == 2:
+            coeff = pd.Series(np.concatenate((self.model.intercept_, self.model.coef_)),
+                              index=["Intercept"]+self.predictors)
+        else:
+            cols = ['coef_class_%d' %
+                    i for i in range(0, self.num_target_class)]
+            coeff = pd.DataFrame(self.model.coef_.T,
+                                 columns=cols, index=self.predictors)
+
+        print('Coefficients:\n')
+        print(coeff)
+
+        self.model_output['Coefficients'] = coeff.to_string()
+
+        # Get Train predictions:
+        self.train_predictions = self.model.predict(
+            self.data_train[self.predictors])
+        self.train_pred_prob = self.model.predict_proba(
+            self.data_train[self.predictors])
+
+        # Get Test predictions:
+        self.test_predictions = self.model.predict(
+            self.data_test[self.predictors])
+        self.test_pred_prob = self.model.predict_proba(
+            self.data_test[self.predictors])
+
+        self.calc_model_characteristics(performCV)
+        self.printReport()
