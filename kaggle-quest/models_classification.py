@@ -1,10 +1,10 @@
 ##########################################################################
-# Credits go to Aarshay Jain: https://github.com/aarshayj
+#                          Credits go to Aarshay Jain: https://github.com/aarshayj
 ##########################################################################
 
 
 ##########################################################################
-# IMPORT STANDARD MODULES
+#                                      IMPORT STANDARD MODULES
 ##########################################################################
 
 
@@ -31,7 +31,7 @@ from xgboost.sklearn import XGBClassifier
 
 
 ##########################################################################
-# GENERIC MODEL CLASS
+#                                    GENERIC MODEL CLASS
 ##########################################################################
 
 
@@ -286,7 +286,6 @@ class GenericModelClass(object):
 
         submission.to_csv(filename, index=False)
 
-
     def create_ensemble_dir(self):
         """
         checks whether the ensemble directory exists and creates one if it 
@@ -297,4 +296,64 @@ class GenericModelClass(object):
         if not os.path.isdir(ensdir):
             os.mkdir(ensdir)
 
-            
+
+##########################################################################
+# LOGISTIC REGRESSION
+##########################################################################
+
+
+class Logistic_Regression(GenericModelClass):
+
+    def __init__(self, data_train, data_test, target, predictors=[], cv_folds=10, scoring_metric='accuracy'):
+        GenericModelClass.__init__(self, model=Logistic_Regression(), data_train=data_train,
+                                   data_test=data_test, target=target, 
+                                   predictors=predictors,
+                                   cv_folds = cv_folds,
+                                   scoring_metric=scoring_metric)
+
+        self.default_parameters = {'C':1.0, 'tol':0.0001, 'solver':'liblinear','multi_class':'ovr',
+                                    'class_weight':'balanced'}
+
+        self.model_output = pd.Series(self.default_parameters)
+        self.model_output['Coefficients'] = "-"
+
+        # Set parameters to default values:
+        self.set_parameters(set_default=True)
+
+
+    def set_parameters(self, param=None, set_default=False):
+        """
+        # Set the parameters of the model. 
+        # Note: 
+        #     > only the parameters to be updated are required to be passed
+        #     > if set_default is True, the passed parameters are 
+        # ignored and default parameters are set which are defined in scikit learn module.
+        """
+        if set_default:
+            param = self.default_parameters
+
+        if 'C' in param:
+            self.model.set_params(C=param['C'])
+            self.model_output['C'] = param['C']
+
+        if 'tol' in param:
+            self.model.set_params(tol=param['tol'])
+            self.model_output['tol'] = param['tol']
+
+        if 'solver' in param:
+            self.model.set_params(solver=param['solver'])
+            self.model_output['solver'] = param['solver']
+
+        if 'multi_class' in param:
+            self.model.set_params(multi_class=param['multi_class'])
+            self.model_output['multi_class'] = param['multi_class']
+
+        if 'class_weight' in param:
+            self.model.set_params(class_weight=param['class_weight'])
+            self.model_output['class_weight'] = param['class_weight']
+
+        if 'cv_folds' in param:
+            self.cv_folds = param['cv_folds']
+
+
+
