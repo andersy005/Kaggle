@@ -16,3 +16,6 @@ unzip test.zip
 rm -r test.zip 
 
 
+wget --header 'Host: storage.googleapis.com' --user-agent 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:57.0) Gecko/20100101 Firefox/57.0' --header 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header 'Accept-Language: en-US,en;q=0.5' --referer 'https://www.kaggle.com/c/sp-society-camera-model-identification/data' --header 'DNT: 1' --header 'Upgrade-Insecure-Requests: 1' 'https://storage.googleapis.com/kaggle-competitions-data/kaggle/8078/sample_submission.csv.zip?GoogleAccessId=web-data@kaggle-161607.iam.gserviceaccount.com&Expires=1515202131&Signature=Hc3VNBZWMbIcbcH64g4WQeJVD4pXMbntBUkaeiQ%2BkPRZog8DFgQWFDvX0l7ADJfmXyfrK%2B09UWNadA%2Fu4pI%2FZ2j8%2F8MA%2BM3vJIBHQUDKgn5QE3zNMt%2BVGhApkMK5aXG9wE6I%2BxWN3g%2FX6mxZk4mSu805sYHy%2FZSXdSvprz8ZGZtYf40XPWHuN6o5bFP9pygrOjQNT3Mc6d1gR2Jtjek16vMMRliinz%2FYsns2wmM0RQ8%2BzZ%2F1qw%2BeHjrsgebBwiXqofQiDVyfnW0c%2BEgzPIYppB6rxSaiGlHX8JU8oS9d9POlmpUBSQPZDDP98FXiYKFpGuF8HmGr%2F6gn%2BM4BKGFQFA%3D%3D' --output-document 'sample_submission.csv.zip'
+unzip submission.csv.zip 
+rm -r submission.csv.zip 
