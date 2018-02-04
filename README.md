@@ -1,10 +1,14 @@
 # Kaggle Quest
 
-This repository contains the source code that I have written for Kaggle competitions.
+This repository contains source code for various Kaggle competitions.
 
 My Kaggle Profile can be found [here](https://www.kaggle.com/andersy005).
 
 
-## 1. [Planet: Understanding the Amazon from Space](https://github.com/andersy005/Kaggle-Quest/tree/master/Competitions/Planet-Amazon-RainForest): Use satellite data to track the human footprint in the Amazon rainforest
+## Entered Competitions 
 
-![Planet: Understanding the Amazon from Space](./Competitions/Planet-Amazon-RainForest/header.png)
+1. [2018 Data Science Bowl ](https://www.kaggle.com/c/data-science-bowl-2018)
+
+2. [IEEE's Signal Processing Society - Camera Model Identification](https://www.kaggle.com/c/sp-society-camera-model-identification)
+
+3. 
